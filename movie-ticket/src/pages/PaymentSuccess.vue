@@ -33,7 +33,7 @@ const downloadTicket = () => {
   // PDF Configuration
   const options = {
     margin: [10, 10],
-    filename: `MovieTicket-${route.query.seats}.pdf`,
+    filename: `CinePlex-${selectedMovie.value.title}-${selectedTheater.value.name}-${Math.random().toString(36).substr(2, 15).toUpperCase()}.pdf`,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: {
       scale: 2, // Higher scale = better resolution
@@ -213,7 +213,13 @@ const handleDownload = async () => {
             />
             <div style="text-align: left">
               <h3
-                style="font-bold; font-size: 18px; margin: 0; color: #0f172a; line-height: 1.2;"
+                style="
+                  font: bold;
+                  font-size: 18px;
+                  margin: 0;
+                  color: #0f172a;
+                  line-height: 1.2;
+                "
               >
                 {{ selectedMovie.title }}
               </h3>
