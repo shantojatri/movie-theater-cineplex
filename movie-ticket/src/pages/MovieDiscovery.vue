@@ -1,9 +1,9 @@
 <script setup>
-import { useResponsive } from '../composables/useResponsive'
-import MovieDiscoveryMobile from './MovieDiscoveryMobile.vue'
-import MovieDiscoveryDesktop from './MovieDiscoveryDesktop.vue'
+import { useResponsive } from "../composables/useResponsive";
+import MovieDiscoveryMobile from "./MovieDiscoveryMobile.vue";
+import MovieDiscoveryDesktop from "./Home.vue";
 
-const { isMobile } = useResponsive()
+const { isMobile } = useResponsive();
 </script>
 
 <template>

@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { movies, featuredMovie, theaters } from "../data/movies";
-import AppHeaderDesktop from "../components/AppHeaderDesktop.vue";
+import AppHeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 
 // 1. Discount Logic

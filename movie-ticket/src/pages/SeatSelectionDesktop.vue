@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { movies, featuredMovie, theaters } from "../data/movies";
-import HeaderDesktop from "../components/AppHeaderDesktop.vue";
+import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 
 const route = useRoute();

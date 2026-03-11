@@ -1,16 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
-import MovieDiscovery from "../pages/MovieDiscovery.vue";
 import TheaterSelection from "../pages/TheaterSelection.vue";
 import TicketSelection from "../pages/TicketSelection.vue";
 import AllMovies from "../pages/AllMovies.vue";
 import CheckoutPage from "../pages/CheckoutPage.vue";
 import PaymentSuccess from "../pages/PaymentSuccess.vue";
+import Home from "../pages/Home.vue";
 
 const routes = [
   {
     path: "/",
-    name: "MovieDiscovery",
-    component: MovieDiscovery,
+    name: "Home",
+    component: Home,
   },
   {
     path: "/all-movies",

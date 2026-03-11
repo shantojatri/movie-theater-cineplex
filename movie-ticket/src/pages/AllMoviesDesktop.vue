@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import HeaderDesktop from "../components/AppHeaderDesktop.vue";
+import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import { movies } from "../data/movies";
 
@@ -79,20 +79,6 @@ onMounted(() => {
               available
             </p>
           </div>
-
-          <!-- Search Bar -->
-          <!-- <label class="flex flex-col w-full max-w-xs relative">
-            <div class="flex items-stretch rounded-xl h-11 overflow-hidden bg-primary/8 border border-primary/20 focus-within:border-primary transition-all shadow-sm">
-              <div class="text-primary flex items-center justify-center pl-4">
-                <span class="material-symbols-outlined text-xl">search</span>
-              </div>
-              <input
-                v-model="searchQuery"
-                class="form-input flex w-full border-none bg-transparent focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-sm font-medium focus:outline-none px-3"
-                placeholder="Search movies..."
-              />
-            </div>
-          </label> -->
         </div>
 
         <!-- Genre Filter Chips -->

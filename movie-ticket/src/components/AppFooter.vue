@@ -3,8 +3,10 @@
 </script>
 
 <template>
-  <footer class="px-6 lg:px-20 py-10 border-t border-primary/10 bg-primary/5">
-    <div class="max-w-7xl mx-auto">
+  <footer
+    class="flex flex-wrap md:flex-nowrap items-center justify-around px-6 lg:px-20 py-10 border-t border-primary/10 bg-primary/5"
+  >
+    <div class="mx-auto">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
         <!-- Brand -->
         <div class="col-span-2 md:col-span-1 flex flex-col gap-4">
@@ -12,7 +14,7 @@
             <span class="material-symbols-outlined text-3xl">movie_filter</span>
             <span
               class="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight"
-              >Cine<span class="text-primary">Plex</span></span
+              >Shanto<span class="text-primary">Plex</span></span
             >
           </div>
           <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
@@ -45,6 +47,7 @@
             </a>
           </div>
         </div>
+
         <!-- Quick Links -->
         <div class="flex flex-col gap-3">
           <h4
@@ -73,6 +76,7 @@
             >Gift Cards</a
           >
         </div>
+
         <!-- Support -->
         <div class="flex flex-col gap-3">
           <h4
@@ -101,6 +105,7 @@
             >Contact Us</a
           >
         </div>
+
         <!-- Newsletter -->
         <div class="col-span-2 md:col-span-1 flex flex-col gap-3">
           <h4
@@ -125,10 +130,11 @@
           </div>
         </div>
       </div>
+
       <div
         class="pt-8 border-t border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 dark:text-slate-400"
       >
-        <p>© 2024 CineStream. All rights reserved.</p>
+        <p>&copy; 2024 ShantoPlex. All rights reserved.</p>
         <div class="flex gap-6">
           <a class="hover:text-primary transition-colors" href="#"
             >Privacy Policy</a

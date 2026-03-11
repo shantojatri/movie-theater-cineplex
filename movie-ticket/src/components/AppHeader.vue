@@ -34,7 +34,7 @@ const toggleNotifications = () => {
         <h2
           class="text-slate-900 dark:text-slate-100 text-xl lg:text-2xl font-bold leading-tight tracking-tight"
         >
-          CinePlex
+          Shanto<span class="text-primary">Plex</span>
         </h2>
       </router-link>
       <nav class="hidden md:flex items-center gap-6 lg:gap-8">

@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { movies, featuredMovie, theaters } from "../data/movies";
-import AppHeaderDesktop from "../components/AppHeaderDesktop.vue";
+import AppHeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import html2pdf from "html2pdf.js";
 

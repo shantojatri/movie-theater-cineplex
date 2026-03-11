@@ -1,27 +1,27 @@
 <script setup>
 import { ref, computed } from "vue";
-import HeaderDesktop from "../components/AppHeaderDesktop.vue";
+import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import TrailerModal from "../components/TrailerModal.vue";
 import { movies, featuredMovie } from "../data/movies";
 
 const isTrailerOpen = ref(false);
 
-// Derive unique genres from movies data
-const genres = computed(() => {
-  const all = movies.map((m) => m.genre);
+// Derive unique moviesStatus from movies data
+const moviesStatus = computed(() => {
+  const all = movies.map((m) => m.status);
   return ["All", ...new Set(all)];
 });
 
-const selectedGenre = ref("All");
+const selectedStatus = ref("All");
 
 const filteredMovies = computed(() => {
-  if (selectedGenre.value === "All") return movies;
-  return movies.filter((m) => m.genre === selectedGenre.value);
+  if (selectedStatus.value === "All") return movies;
+  return movies.filter((m) => m.status === selectedStatus.value);
 });
 
-function selectGenre(genre) {
-  selectedGenre.value = genre;
+function selectStatus(status) {
+  selectedStatus.value = status;
 }
 </script>
 
@@ -95,6 +95,7 @@ function selectGenre(genre) {
             </div>
           </div>
         </div>
+
         <!-- Filters and List Section -->
         <div class="px-6 lg:px-20 pb-20">
           <div
@@ -109,20 +110,21 @@ function selectGenre(genre) {
               class="flex flex-wrap bg-primary/5 dark:bg-primary/10 p-1 rounded-xl border border-primary/10 gap-1"
             >
               <button
-                v-for="genre in genres"
-                :key="genre"
-                @click="selectGenre(genre)"
+                v-for="status in moviesStatus"
+                :key="status"
+                @click="selectStatus(status)"
                 :class="[
                   'px-6 py-2 rounded-lg text-sm font-bold transition-all',
-                  selectedGenre === genre
+                  selectedStatus === status
                     ? 'bg-primary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-primary hover:bg-primary/10',
                 ]"
               >
-                {{ genre }}
+                {{ status }}
               </button>
             </div>
           </div>
+
           <!-- Movie Grid -->
           <div
             class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6"
@@ -130,7 +132,6 @@ function selectGenre(genre) {
             <div
               v-for="movie in filteredMovies"
               :key="movie.id"
-              @click="$router.push('/theaters?movieId=' + movie.id)"
               class="group flex flex-col gap-3 cursor-pointer"
             >
               <div
@@ -138,11 +139,33 @@ function selectGenre(genre) {
               >
                 <div
                   class="absolute inset-0 bg-center bg-no-repeat bg-cover"
-                  :data-alt="`${movie.title} poster visual`"
                   :style="`background-image: url('${movie.imageUrl}');`"
                 ></div>
+
                 <div
-                  class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1"
+                  class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]"
+                >
+                  <button
+                    v-if="movie.trailerUrl"
+                    @click.prevent="isTrailerOpen = true"
+                    class="w-14 h-14 rounded-full bg-white/20 border border-white/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+                  >
+                    <span
+                      class="material-symbols-outlined text-white text-4xl fill-1"
+                      >play_arrow</span
+                    >
+                  </button>
+
+                  <button
+                    @click.stop="$router.push('/theaters?movieId=' + movie.id)"
+                    class="absolute bottom-4 left-4 right-4 bg-primary text-white py-1 rounded-lg font-bold text-xs shadow-lg hover:bg-primary/90 transition-colors cursor-pointer"
+                  >
+                    BOOK NOW
+                  </button>
+                </div>
+
+                <div
+                  class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 group-hover:opacity-0 transition-opacity"
                 >
                   <span
                     class="material-symbols-outlined text-xs text-yellow-500 fill-1"
@@ -151,6 +174,7 @@ function selectGenre(genre) {
                   {{ movie.rating.toFixed(1) }}
                 </div>
               </div>
+
               <div class="px-1">
                 <h3
                   class="text-slate-900 dark:text-slate-100 text-lg font-bold truncate group-hover:text-primary transition-colors"
@@ -170,6 +194,7 @@ function selectGenre(genre) {
               </div>
             </div>
           </div>
+
           <!-- View More Button -->
           <div class="mt-12 flex justify-center">
             <router-link
@@ -186,6 +211,7 @@ function selectGenre(genre) {
       <AppFooter />
     </div>
   </div>
+
   <!-- Trailer Modal -->
   <TrailerModal
     :trailer-url="featuredMovie.trailerUrl"

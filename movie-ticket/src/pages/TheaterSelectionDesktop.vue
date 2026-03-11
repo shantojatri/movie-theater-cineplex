@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
-import HeaderDesktop from "../components/AppHeaderDesktop.vue";
+import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import { useRoute, useRouter } from "vue-router";
 import { movies, featuredMovie, theaters } from "../data/movies";
