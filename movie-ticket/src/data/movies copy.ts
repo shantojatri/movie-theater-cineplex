@@ -212,7 +212,7 @@ export const movies: Movie[] = [
     rating: 0,
     duration: "2h 18m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BNTRlNmU1NzEtODNkNC00ZGM3LWFmNzQtMjBlMWRiYTcyMGRhXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500", // Dark dramatic theme
     year: 2024,
     casts: ["Joaquin Phoenix", "Lady Gaga", "Zazie Beetz"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -228,7 +228,7 @@ export const movies: Movie[] = [
     rating: 0,
     duration: "2h 30m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BMWYzZTM5ZGQtOGE5My00NmM2LWFlMDEtMGNjYjdmOWM1MzA1XkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?q=80&w=500", // Roman/Armor theme
     year: 2024,
     casts: ["Paul Mescal", "Pedro Pascal", "Denzel Washington"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -244,7 +244,7 @@ export const movies: Movie[] = [
     rating: 0,
     duration: "2h 40m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BOWMwYjYzYmMtMWQ2Ni00NWUwLTg2MzAtYzkzMDBiZDIwOTMwXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=500", // Magical green/forest theme
     year: 2024,
     casts: ["Cynthia Erivo", "Ariana Grande", "Michelle Yeoh"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -259,7 +259,7 @@ export const movies: Movie[] = [
     status: "Coming Soon",
     rating: 0,
     duration: "2h 15m",
-    imageUrl: "https://m.media-amazon.com/images/M/MV5BY2FhZGE3NmEtNWJjOC00NDI1LWFhMTQtMjcxNmQzZmEwNGIzXkEyXkFqcGc@._V1_.jpg",
+    imageUrl: "https://picsum.photos/id/1029/600/900",
     year: 2024,
     casts: ["Bill Skarsgård", "Nicholas Hoult", "Lily-Rose Depp"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -275,7 +275,7 @@ export const movies: Movie[] = [
     rating: 8.2,
     duration: "2h 7m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BZTk5ODY0MmQtMzA3Ni00NGY1LThiYzItZThiNjFiNDM4MTM3XkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=500", // Superheroes theme
     year: 2024,
     casts: ["Ryan Reynolds", "Hugh Jackman", "Emma Corrin"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -295,7 +295,7 @@ export const movies: Movie[] = [
     rating: 7.6,
     duration: "2h 28m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BNTcwYWE1NTYtOWNiYy00NzY3LWIwY2MtNjJmZDkxNDNmOWE1XkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1509343256512-d77a5cb3791b?q=80&w=500", // Desert/Apocalypse theme
     year: 2024,
     casts: ["Anya Taylor-Joy", "Chris Hemsworth", "Tom Burke"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -311,7 +311,7 @@ export const movies: Movie[] = [
     rating: 8.8,
     duration: "2h 19m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BOWNmMzAzZmQtNDQ1NC00Nzk5LTkyMmUtNGI2N2NkOWM4MzEyXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800",
     year: 2022,
     casts: ["Michelle Yeoh", "Ke Huy Quan", "Jamie Lee Curtis"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -327,7 +327,7 @@ export const movies: Movie[] = [
     rating: 8.3,
     duration: "2h 10m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BMDBkZDNjMWEtOTdmMi00NmExLTg5MmMtNTFlYTJlNWY5YTdmXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1517976384346-3136801d605d?q=80&w=800", // Aviation theme
     year: 2022,
     casts: ["Tom Cruise", "Miles Teller", "Jennifer Connelly"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -343,7 +343,7 @@ export const movies: Movie[] = [
     rating: 8.6,
     duration: "2h 20m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BNThiZjA3MjItZGY5Ni00ZmJhLWEwN2EtOTBlYTA4Y2E0M2ZmXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1635805737707-575885ab0820?q=80&w=500", // Spider/Modern theme
     year: 2023,
     casts: ["Shameik Moore", "Hailee Steinfeld", "Oscar Isaac"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -359,7 +359,7 @@ export const movies: Movie[] = [
     rating: 8.0,
     duration: "2h 21m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BYWU2MjRjZTYtMjVkMS00MTBjLWFiMTAtYmZlYTk1YjkyMWFkXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=500", // Artistic cinematic theme
     year: 2023,
     casts: ["Emma Stone", "Mark Ruffalo", "Willem Dafoe"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -375,7 +375,7 @@ export const movies: Movie[] = [
     rating: 7.5,
     duration: "1h 59m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BMDU0NjcwOGQtNjNjOS00NzQ3LWIwM2YtYWVmODZjMzQzN2ExXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=500", // Space/Sci-fi theme
     year: 2024,
     casts: ["Cailee Spaeny", "David Jonsson", "Archie Renaux"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -391,7 +391,7 @@ export const movies: Movie[] = [
     rating: 7.7,
     duration: "1h 57m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BYmNhOWMyNTYtNTljNC00NTU3LWFiYmQtMDBhOGU5NWFhNGU5XkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=500", // Moody portrait theme
     year: 2022,
     casts: ["Brendan Fraser", "Sadie Sink", "Ty Simpkins"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -407,7 +407,7 @@ export const movies: Movie[] = [
     rating: 7.9,
     duration: "1h 45m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BYjQyMTNhNjUtN2VmYy00NWRhLTkwOTctMGVmNTBmNDIxYjZhXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=500", // Romantic portrait theme
     year: 2023,
     casts: ["Greta Lee", "Teo Yoo", "John Magaro"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -423,7 +423,7 @@ export const movies: Movie[] = [
     rating: 7.1,
     duration: "2h 2m",
     imageUrl:
-      "https://m.media-amazon.com/images/M/MV5BNjM4MWEwMTEtNTcwYi00ZDI4LWEwMzUtNDMzODBhZmI5MWE1XkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?q=80&w=500", // Storm/Tornado theme
     year: 2024,
     casts: ["Daisy Edgar-Jones", "Glen Powell", "Anthony Ramos"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",

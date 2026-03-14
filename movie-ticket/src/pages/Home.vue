@@ -6,6 +6,12 @@ import TrailerModal from "../components/TrailerModal.vue";
 import { movies, featuredMovie } from "../data/movies";
 
 const isTrailerOpen = ref(false);
+const currentTrailerUrl = ref(featuredMovie?.trailerUrl || "");
+
+function openTrailer(url) {
+  currentTrailerUrl.value = url;
+  isTrailerOpen.value = true;
+}
 
 // Derive unique moviesStatus from movies data
 const moviesStatus = computed(() => {
@@ -84,7 +90,7 @@ function selectStatus(status) {
                 </button>
                 <a
                   v-if="featuredMovie.trailerUrl"
-                  @click.prevent="isTrailerOpen = true"
+                  @click.prevent="openTrailer(featuredMovie.trailerUrl)"
                   href="#"
                   class="flex min-w-[140px] items-center justify-center gap-2 rounded-lg h-12 px-6 bg-white/10 backdrop-blur-md text-white border border-white/20 text-base font-bold transition-all hover:bg-white/20 cursor-pointer"
                 >
@@ -132,22 +138,24 @@ function selectStatus(status) {
             <div
               v-for="movie in filteredMovies"
               :key="movie.id"
+              @click="$router.push('/theaters?movieId=' + movie.id)"
               class="group flex flex-col gap-3 cursor-pointer"
             >
               <div
                 class="relative w-full aspect-[3/4] overflow-hidden rounded-xl shadow-md transition-all group-hover:shadow-xl group-hover:shadow-primary/20 group-hover:-translate-y-1"
               >
                 <div
-                  class="absolute inset-0 bg-center bg-no-repeat bg-cover"
+                  class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-105"
                   :style="`background-image: url('${movie.imageUrl}');`"
                 ></div>
 
+                <!-- Hover overlay -->
                 <div
                   class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]"
                 >
                   <button
                     v-if="movie.trailerUrl"
-                    @click.prevent="isTrailerOpen = true"
+                    @click.stop="openTrailer(movie.trailerUrl)"
                     class="w-14 h-14 rounded-full bg-white/20 border border-white/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
                   >
                     <span
@@ -158,12 +166,14 @@ function selectStatus(status) {
 
                   <button
                     @click.stop="$router.push('/theaters?movieId=' + movie.id)"
-                    class="absolute bottom-4 left-4 right-4 bg-primary text-white py-1 rounded-lg font-bold text-xs shadow-lg hover:bg-primary/90 transition-colors cursor-pointer"
+                    class="absolute bottom-4 left-4 right-4 bg-primary text-white py-2 rounded-lg font-bold text-sm shadow-lg hover:bg-primary/90 transition-colors cursor-pointer flex items-center justify-center gap-1"
                   >
-                    BOOK NOW
+                    <span class="material-symbols-outlined text-base">confirmation_number</span>
+                    Book Now
                   </button>
                 </div>
 
+                <!-- Rating badge -->
                 <div
                   class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 group-hover:opacity-0 transition-opacity"
                 >
@@ -173,11 +183,25 @@ function selectStatus(status) {
                   >
                   {{ movie.rating.toFixed(1) }}
                 </div>
+                <!-- Status badge -->
+                <div
+                  v-if="movie.status"
+                  :class="[
+                    'absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full',
+                    movie.status === 'In Theaters'
+                      ? 'bg-green-500/80 text-white'
+                      : movie.status === 'Coming Soon'
+                        ? 'bg-amber-500/80 text-white'
+                        : 'bg-blue-500/80 text-white',
+                  ]"
+                >
+                  {{ movie.status }}
+                </div>
               </div>
 
               <div class="px-1">
                 <h3
-                  class="text-slate-900 dark:text-slate-100 text-lg font-bold truncate group-hover:text-primary transition-colors"
+                  class="text-slate-900 dark:text-slate-100 text-sm font-bold truncate group-hover:text-primary transition-colors"
                 >
                   {{ movie.title }}
                 </h3>
@@ -186,10 +210,7 @@ function selectStatus(status) {
                     class="text-primary text-xs font-semibold px-2 py-0.5 rounded bg-primary/10"
                     >{{ movie.genre }}</span
                   >
-                  <span
-                    class="text-slate-500 dark:text-slate-400 text-xs font-medium"
-                    >{{ movie.status }}</span
-                  >
+                  <span class="text-slate-400 text-xs">{{ movie.duration }}</span>
                 </div>
               </div>
             </div>
@@ -214,7 +235,7 @@ function selectStatus(status) {
 
   <!-- Trailer Modal -->
   <TrailerModal
-    :trailer-url="featuredMovie.trailerUrl"
+    :trailer-url="currentTrailerUrl"
     :is-open="isTrailerOpen"
     @close="isTrailerOpen = false"
   />

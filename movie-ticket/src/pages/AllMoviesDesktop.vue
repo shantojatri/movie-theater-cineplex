@@ -3,12 +3,20 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
+import TrailerModal from "../components/TrailerModal.vue";
 import { movies } from "../data/movies";
 
 const router = useRouter();
 const route = useRoute();
 const searchQuery = ref("");
 const selectedGenre = ref("All");
+const isTrailerOpen = ref(false);
+const currentTrailerUrl = ref("");
+
+function openTrailer(url) {
+  currentTrailerUrl.value = url;
+  isTrailerOpen.value = true;
+}
 
 // Unique genres derived from data
 const genres = computed(() => {
@@ -160,14 +168,24 @@ onMounted(() => {
                   ></div>
                   <!-- Hover overlay -->
                   <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
+                    class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]"
                   >
                     <button
-                      class="w-full py-2 bg-primary text-white text-sm font-bold rounded-lg shadow-xl flex items-center justify-center gap-1"
+                      v-if="movie.trailerUrl"
+                      @click.stop="openTrailer(movie.trailerUrl)"
+                      class="w-14 h-14 rounded-full bg-white/20 border border-white/30 flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
                     >
-                      <span class="material-symbols-outlined text-base"
-                        >confirmation_number</span
+                      <span
+                        class="material-symbols-outlined text-white text-4xl fill-1"
+                        >play_arrow</span
                       >
+                    </button>
+
+                    <button
+                      @click.stop="goToMovie(movie.id)"
+                      class="absolute bottom-4 left-4 right-4 bg-primary text-white py-2 rounded-lg font-bold text-sm shadow-lg hover:bg-primary/90 transition-colors cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <span class="material-symbols-outlined text-base">confirmation_number</span>
                       Book Now
                     </button>
                   </div>
@@ -220,4 +238,11 @@ onMounted(() => {
       <AppFooter />
     </div>
   </div>
+
+  <!-- Trailer Modal -->
+  <TrailerModal
+    :trailer-url="currentTrailerUrl"
+    :is-open="isTrailerOpen"
+    @close="isTrailerOpen = false"
+  />
 </template>
