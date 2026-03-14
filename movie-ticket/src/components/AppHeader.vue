@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
+import { useAuth } from "../composables/useAuth";
 
+const { user, isAuthenticated, logout } = useAuth();
 const isProfileOpen = ref(false);
 const isNotificationsOpen = ref(false);
 
@@ -159,7 +161,7 @@ const toggleNotifications = () => {
       </div>
 
       <!-- Profile -->
-      <div class="relative">
+      <div class="relative" v-if="isAuthenticated && user">
         <button
           @click="toggleProfile"
           :class="[
@@ -190,21 +192,21 @@ const toggleNotifications = () => {
             ></div>
             <div>
               <p class="font-bold text-slate-900 dark:text-slate-100">
-                Alex Moviegoer
+                {{ user.name }}
               </p>
-              <p class="text-xs text-slate-500">alex@example.com</p>
+              <p class="text-xs text-slate-500">{{ user.email }}</p>
             </div>
           </div>
           <div class="py-2">
-            <a
-              href="#"
+            <router-link
+              to="/my-tickets"
               class="flex items-center gap-3 px-4 py-2 hover:bg-primary/5 text-slate-700 dark:text-slate-300 transition-colors"
             >
               <span class="material-symbols-outlined text-slate-400"
                 >confirmation_number</span
               >
               <span class="text-sm font-medium">My Tickets</span>
-            </a>
+            </router-link>
             <a
               href="#"
               class="flex items-center gap-3 px-4 py-2 hover:bg-primary/5 text-slate-700 dark:text-slate-300 transition-colors"
@@ -227,16 +229,25 @@ const toggleNotifications = () => {
           <div
             class="border-t border-primary/10 py-2 bg-slate-50 dark:bg-black/20"
           >
-            <a
-              href="#"
-              class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-red-600 dark:text-red-400 dark:hover:bg-red-900/10 transition-colors"
+            <button
+              @click="logout"
+              class="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-red-600 dark:text-red-400 dark:hover:bg-red-900/10 transition-colors"
             >
               <span class="material-symbols-outlined">logout</span>
               <span class="text-sm font-medium">Sign Out</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      <!-- Login Button -->
+      <router-link
+        v-else
+        to="/login"
+        class="bg-primary text-white font-bold px-5 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm text-sm"
+      >
+        Sign In
+      </router-link>
     </div>
   </header>
 </template>

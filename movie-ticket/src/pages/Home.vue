@@ -1,9 +1,16 @@
 <script setup>
 import { ref, computed } from "vue";
+import { onMounted } from "vue";
 import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import TrailerModal from "../components/TrailerModal.vue";
-import { movies, featuredMovie } from "../data/movies";
+import { useMovies } from "../composables/useMovies";
+
+const { movies, featuredMovie, fetchMovies, isLoading, error } = useMovies();
+
+onMounted(() => {
+  fetchMovies();
+});
 
 const isTrailerOpen = ref(false);
 const currentTrailerUrl = ref(featuredMovie?.trailerUrl || "");
@@ -15,15 +22,17 @@ function openTrailer(url) {
 
 // Derive unique moviesStatus from movies data
 const moviesStatus = computed(() => {
-  const all = movies.map((m) => m.status);
+  if (!movies.value || movies.value.length === 0) return ["All"];
+  const all = movies.value.map((m) => m.status);
   return ["All", ...new Set(all)];
 });
 
 const selectedStatus = ref("All");
 
 const filteredMovies = computed(() => {
-  if (selectedStatus.value === "All") return movies;
-  return movies.filter((m) => m.status === selectedStatus.value);
+  if (!movies.value) return [];
+  if (selectedStatus.value === "All") return movies.value;
+  return movies.value.filter((m) => m.status === selectedStatus.value);
 });
 
 function selectStatus(status) {
@@ -39,11 +48,18 @@ function selectStatus(status) {
       <!-- Top Navigation Bar -->
       <HeaderDesktop />
       <main class="flex-1">
-        <!-- Hero Section -->
-        <div class="px-6 lg:px-20 py-8">
-          <div class="@container">
-            <div
-              class="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-start justify-end px-6 pb-12 lg:px-16 lg:pb-16 overflow-hidden shadow-2xl"
+        <div v-if="isLoading" class="flex justify-center py-20">
+          <span class="material-symbols-outlined animate-spin text-5xl text-primary">progress_activity</span>
+        </div>
+        <div v-else-if="error" class="text-center text-red-500 py-20 font-bold">
+          {{ error }}
+        </div>
+        <div v-else>
+          <!-- Hero Section -->
+          <div class="px-6 lg:px-20 py-8" v-if="featuredMovie">
+            <div class="@container">
+              <div
+                class="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-start justify-end px-6 pb-12 lg:px-16 lg:pb-16 overflow-hidden shadow-2xl"
               :data-alt="`${featuredMovie.title} cover image`"
               :style="`background-image: linear-gradient(to top, rgba(34, 16, 16, 0.95) 0%, rgba(34, 16, 16, 0.4) 50%, rgba(34, 16, 16, 0.1) 100%), url('${featuredMovie.imageUrl}');`"
             >
@@ -80,7 +96,7 @@ function selectStatus(status) {
               </div>
               <div class="flex flex-wrap gap-4 relative z-10">
                 <button
-                  @click="$router.push('/theaters?movieId=' + featuredMovie.id)"
+                  @click="$router.push('/theaters?movieId=' + featuredMovie.ID)"
                   class="flex min-w-[140px] items-center justify-center gap-2 rounded-lg h-12 px-6 bg-primary text-white text-base font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/30"
                 >
                   <span class="material-symbols-outlined"
@@ -137,8 +153,8 @@ function selectStatus(status) {
           >
             <div
               v-for="movie in filteredMovies"
-              :key="movie.id"
-              @click="$router.push('/theaters?movieId=' + movie.id)"
+              :key="movie.ID"
+              @click="$router.push('/theaters?movieId=' + movie.ID)"
               class="group flex flex-col gap-3 cursor-pointer"
             >
               <div
@@ -165,7 +181,7 @@ function selectStatus(status) {
                   </button>
 
                   <button
-                    @click.stop="$router.push('/theaters?movieId=' + movie.id)"
+                    @click.stop="$router.push('/theaters?movieId=' + movie.ID)"
                     class="absolute bottom-4 left-4 right-4 bg-primary text-white py-2 rounded-lg font-bold text-sm shadow-lg hover:bg-primary/90 transition-colors cursor-pointer flex items-center justify-center gap-1"
                   >
                     <span class="material-symbols-outlined text-base">confirmation_number</span>
@@ -226,6 +242,7 @@ function selectStatus(status) {
               <span class="material-symbols-outlined">arrow_forward</span>
             </router-link>
           </div>
+        </div>
         </div>
       </main>
       <!-- Simple Footer -->

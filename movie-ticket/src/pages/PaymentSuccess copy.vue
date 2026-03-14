@@ -25,7 +25,7 @@ const qrDataUrl = ref("");
 const posterDataUrl = ref("");
 const isDownloading = ref(false);
 
-// Helper to convert images to Base64 (Essential for PDF rendering)
+// Helper to convert images to Base64 (prevents blank images in PDF)
 const fetchAsDataUrl = async (url) => {
   try {
     const response = await fetch(url);
@@ -36,50 +36,48 @@ const fetchAsDataUrl = async (url) => {
       reader.readAsDataURL(blob);
     });
   } catch (e) {
-    console.error("Image load failed", e);
-    return url; // Fallback to original URL
+    return url;
   }
 };
 
 onMounted(async () => {
-  // Generate QR Code as a high-res Base64 string
   const qrData = `SHANTOPLEX-${route.query.movieId ?? "X"}-${route.query.theaterId ?? "X"}-${route.query.seats ?? "X"}`;
+
+  // Generate high-quality QR
   qrDataUrl.value = await QRCode.toDataURL(qrData, {
     width: 300,
     margin: 1,
     color: { dark: "#1e293b", light: "#ffffff" },
   });
 
-  // Convert Movie Poster to Base64 so html2pdf doesn't ignore it
   if (selectedMovie.value?.imageUrl) {
     posterDataUrl.value = await fetchAsDataUrl(selectedMovie.value.imageUrl);
   }
 });
 
 const handleDownload = async () => {
-  if (isDownloading.value) return;
+  if (!qrDataUrl.value) return;
   isDownloading.value = true;
 
-  // Wait for any pending DOM updates (like the 'Generating...' text)
-  await nextTick();
+  await nextTick(); // Wait for DOM updates
 
   const options = {
-    margin: 5,
-    filename: `Ticket-${selectedMovie.value?.title || "Movie"}.pdf`,
-    image: { type: "jpeg", quality: 1 },
+    margin: [10, 10],
+    filename: `ShantoPlex-${selectedMovie.value?.title || "Ticket"}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
     html2canvas: {
-      scale: 3, // High scale prevents blurry QR codes
+      scale: 3, // High scale for clear QR scanning
       useCORS: true,
+      allowTaint: false,
       letterRendering: true,
     },
     jsPDF: { unit: "mm", format: "a5", orientation: "portrait" },
   };
 
   try {
-    const worker = html2pdf().set(options).from(ticketElement.value);
-    await worker.save();
-  } catch (err) {
-    console.error("PDF Export failed", err);
+    await html2pdf().set(options).from(ticketElement.value).save();
+  } catch (error) {
+    console.error("Download failed:", error);
   } finally {
     isDownloading.value = false;
   }
@@ -101,7 +99,9 @@ const handleDownload = async () => {
           <div
             class="relative bg-primary text-white w-20 h-20 rounded-full flex items-center justify-center shadow-2xl shadow-primary/40"
           >
-            <span class="material-symbols-outlined text-4xl">check</span>
+            <span class="material-symbols-outlined text-4xl font-bold"
+              >check</span
+            >
           </div>
         </div>
 
@@ -110,7 +110,7 @@ const handleDownload = async () => {
             Payment Successful!
           </h1>
           <p class="text-slate-500 dark:text-slate-400 text-sm">
-            Your seats are confirmed.
+            Your seats are confirmed. Enjoy the show!
           </p>
         </div>
 
@@ -128,9 +128,7 @@ const handleDownload = async () => {
             );
             border-radius: 20px;
             overflow: hidden;
-            font-family:
-              Segoe UI,
-              sans-serif;
+            font-family: &quot;Segoe UI&quot;, sans-serif;
             border: 1px solid #fda4af;
           "
         >
@@ -204,21 +202,38 @@ const handleDownload = async () => {
                 border: 2px solid #fda4af;
               "
             />
-            <div style="text-align: left">
+            <div style="text-align: left; flex: 1; min-width: 0">
               <h3
                 style="
-                  font-size: 16px;
-                  font-weight: 800;
+                  font-size: 15px;
+                  font-weight: 900;
                   color: #881337;
-                  margin: 0;
+                  margin: 0 0 4px;
+                  line-height: 1.3;
                 "
               >
                 {{ selectedMovie?.title }}
               </h3>
-              <p style="font-size: 11px; color: #e11d48; margin: 2px 0">
+              <p
+                style="
+                  font-size: 11px;
+                  font-weight: 700;
+                  color: #e11d48;
+                  margin: 0 0 2px;
+                "
+              >
                 {{ selectedTheater?.name }}
               </p>
-              <p style="font-size: 10px; color: #9f1239; opacity: 0.7">
+              <p
+                style="
+                  font-size: 10px;
+                  color: #9f1239;
+                  margin: 0;
+                  opacity: 0.75;
+                  word-break: break-word;
+                  line-height: 1.3;
+                "
+              >
                 {{ selectedTheater?.address }}
               </p>
             </div>
@@ -228,31 +243,23 @@ const handleDownload = async () => {
             style="
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 15px;
-              padding: 20px;
+              gap: 14px;
+              padding: 14px 20px;
               border-bottom: 2px dashed #fda4af;
             "
           >
-            <div
-              v-for="(val, label) in {
-                'Date & Time': route.query.date + ' ' + route.query.time,
-                Seats: route.query.seats,
-                Type: route.query.type || 'Standard',
-                Price: '$' + route.query.price,
-              }"
-              :key="label"
-              style="text-align: left"
-            >
+            <div style="text-align: left">
               <p
                 style="
                   font-size: 9px;
                   font-weight: 700;
                   color: #be123c;
                   text-transform: uppercase;
-                  margin: 0 0 2px;
+                  letter-spacing: 1px;
+                  margin: 0 0 3px;
                 "
               >
-                {{ label }}
+                Date &amp; Time
               </p>
               <p
                 style="
@@ -262,7 +269,89 @@ const handleDownload = async () => {
                   margin: 0;
                 "
               >
-                {{ val }}
+                {{ route.query.date }}
+              </p>
+              <p
+                style="
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #e11d48;
+                  margin: 2px 0 0;
+                "
+              >
+                {{ route.query.time }}
+              </p>
+            </div>
+            <div style="text-align: left">
+              <p
+                style="
+                  font-size: 9px;
+                  font-weight: 700;
+                  color: #be123c;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                  margin: 0 0 3px;
+                "
+              >
+                Theater Type
+              </p>
+              <p
+                style="
+                  font-size: 12px;
+                  font-weight: 800;
+                  color: #1e293b;
+                  margin: 0;
+                "
+              >
+                {{ route.query.type || "Standard" }}
+              </p>
+            </div>
+            <div style="text-align: left">
+              <p
+                style="
+                  font-size: 9px;
+                  font-weight: 700;
+                  color: #be123c;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                  margin: 0 0 3px;
+                "
+              >
+                Seats
+              </p>
+              <p
+                style="
+                  font-size: 13px;
+                  font-weight: 900;
+                  color: #e11d48;
+                  margin: 0;
+                "
+              >
+                {{ route.query.seats }}
+              </p>
+            </div>
+            <div style="text-align: left">
+              <p
+                style="
+                  font-size: 9px;
+                  font-weight: 700;
+                  color: #be123c;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                  margin: 0 0 3px;
+                "
+              >
+                Total Paid
+              </p>
+              <p
+                style="
+                  font-size: 13px;
+                  font-weight: 900;
+                  color: #059669;
+                  margin: 0;
+                "
+              >
+                ${{ route.query.price }}
               </p>
             </div>
           </div>
@@ -277,36 +366,39 @@ const handleDownload = async () => {
           >
             <div
               style="
+                position: absolute;
+                top: -12px;
+                left: -10px;
+                width: 24px;
+                height: 24px;
+                background: #f8fafc;
+                border-radius: 50%;
+                border: 1px solid #fda4af;
+              "
+            ></div>
+            <div
+              style="
+                position: absolute;
+                top: -12px;
+                right: -10px;
+                width: 24px;
+                height: 24px;
+                background: #f8fafc;
+                border-radius: 50%;
+                border: 1px solid #fda4af;
+              "
+            ></div>
+
+            <div
+              style="
                 display: inline-block;
+                background: #ffffff;
                 padding: 10px;
+                border-radius: 14px;
                 border: 2px solid #fda4af;
-                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(244, 63, 94, 0.1);
               "
             >
-              <div
-                style="
-                  position: absolute;
-                  top: -12px;
-                  left: -10px;
-                  width: 24px;
-                  height: 24px;
-                  background: #f8fafc;
-                  border-radius: 50%;
-                  border: 1px solid #fda4af;
-                "
-              ></div>
-              <div
-                style="
-                  position: absolute;
-                  top: -12px;
-                  right: -10px;
-                  width: 24px;
-                  height: 24px;
-                  background: #f8fafc;
-                  border-radius: 50%;
-                  border: 1px solid #fda4af;
-                "
-              ></div>
               <img
                 v-if="qrDataUrl"
                 :src="qrDataUrl"
@@ -321,9 +413,10 @@ const handleDownload = async () => {
                   align-items: center;
                   justify-content: center;
                   color: #fda4af;
+                  font-size: 11px;
                 "
               >
-                Generating QR...
+                Loading…
               </div>
             </div>
             <p
@@ -357,20 +450,24 @@ const handleDownload = async () => {
             :disabled="isDownloading || !qrDataUrl"
             class="w-full bg-primary text-white py-3.5 rounded-xl font-black flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-60"
           >
-            <span class="material-symbols-outlined">{{
-              isDownloading ? "sync" : "download"
+            <span class="material-symbols-outlined text-sm">{{
+              isDownloading ? "hourglass_top" : "download"
             }}</span>
             {{ isDownloading ? "Generating PDF..." : "Download Ticket" }}
           </button>
           <RouterLink
+            to="/my-tickets"
+            class="text-sm font-bold text-primary hover:underline"
+            >View My Tickets</RouterLink
+          >
+          <RouterLink
             to="/"
-            class="text-sm font-medium text-slate-500 hover:text-rose-600"
+            class="text-sm font-medium text-slate-500 hover:text-primary"
             >Back to Home</RouterLink
           >
         </div>
       </div>
     </main>
-
     <AppFooter />
   </div>
 </template>

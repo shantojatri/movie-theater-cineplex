@@ -1,14 +1,15 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import { useRoute, useRouter } from "vue-router";
-import { movies, featuredMovie, theaters } from "../data/movies";
+import { useMovies } from "../composables/useMovies";
 import TrailerModal from "../components/TrailerModal.vue";
 
 const route = useRoute();
 const router = useRouter();
 const isTrailerOpen = ref(false);
+const { getMovieById, fetchMovies } = useMovies();
 
 const getNextSevenDays = () => {
   const days = [];
@@ -48,18 +49,7 @@ const activeDate = ref(0);
 const formats = ["All Formats", "IMAX", "Standard"];
 const activeFormat = ref("All Formats");
 
-const selectedMovie = computed(() => {
-  const movieId = route.query.movieId;
-
-  const foundInArray = movies.find((m) => m.id === movieId);
-  if (foundInArray) return foundInArray;
-
-  if (featuredMovie.id === movieId) {
-    return featuredMovie;
-  }
-
-  return featuredMovie;
-});
+const selectedMovie = getMovieById(route.query.movieId);
 
 const openTrailer = () => {
   if (selectedMovie.value?.trailerUrl) {
@@ -67,12 +57,33 @@ const openTrailer = () => {
   }
 };
 
+const theatersList = ref([]);
+
+onMounted(async () => {
+  await fetchMovies();
+  try {
+    const res = await fetch("http://localhost:8080/api/theaters");
+    if (res.ok) {
+      theatersList.value = await res.json();
+    }
+  } catch (err) {
+    console.error("Failed to load theaters:", err);
+  }
+});
+
 const movieTheatersDetails = computed(() => {
-  const theaterIds = selectedMovie.value?.theaters || [];
+  // If no theaters array is present (since we transitioned to PostgreSQL without M2M tables),
+  // just show all verified theaters as a fallback so the UI isn't empty.
+  const theaterIds = selectedMovie.value?.theaters || [
+    "amc-metreon-16", 
+    "century-san-francisco-centre", 
+    "roxie-theater",
+    "regal-stonestown"
+  ];
 
   return theaterIds
     .map((id) => {
-      return theaters.find((t) => t.theaterId === id);
+      return theatersList.value.find((t) => t.theaterId === id);
     })
     .filter((t) => t !== undefined);
 });
@@ -81,7 +92,7 @@ const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
   router.push({
     path: "/tickets",
     query: {
-      movieId: selectedMovie.value.id,
+      movieId: selectedMovie.value.ID || selectedMovie.value.id,
       theaterId: theaterId,
       date: dates.value[activeDate.value].fullDate,
       price: moviePrice,

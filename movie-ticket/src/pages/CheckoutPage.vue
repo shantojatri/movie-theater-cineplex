@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { movies, featuredMovie, theaters } from "../data/movies";
+import { useMovies } from "../composables/useMovies";
+import { useAuth } from "../composables/useAuth";
 import AppHeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 
@@ -13,18 +14,12 @@ const route = useRoute();
 const router = useRouter();
 const totalPrice = ref(0);
 
-const selectedMovie = computed(() => {
-  const movieId = route.query.movieId;
+const { getMovieById, fetchMovies } = useMovies();
+const { token } = useAuth();
+const isProcessing = ref(false);
+const errorMsg = ref("");
 
-  const foundInArray = movies.find((m) => m.id === movieId);
-  if (foundInArray) return foundInArray;
-
-  if (featuredMovie.id === movieId) {
-    return featuredMovie;
-  }
-
-  return featuredMovie;
-});
+const selectedMovie = getMovieById(route.query.movieId);
 
 const applyCoupon = () => {
   if (couponCode.value.toUpperCase() === "SAVE10") {
@@ -50,22 +45,51 @@ const paymentMethods = [
 ];
 const selectedPayment = ref("card");
 
-onMounted(() => {
+onMounted(async () => {
   totalPrice.value = route.query.price * route.query.seats.split(",").length;
+  await fetchMovies();
 });
 
-const paymentSuccess = () => {
-  router.push({
-    name: "PaymentSuccess",
-    query: {
-      movieId: route.query.movieId,
-      theaterId: route.query.theaterId,
-      date: route.query.date,
-      time: route.query.time,
-      price: totalPrice.value,
-      seats: route.query.seats,
-    },
-  });
+const paymentSuccess = async () => {
+  isProcessing.value = true;
+  errorMsg.value = "";
+  try {
+    const response = await fetch("http://localhost:8080/api/tickets/book", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify({
+        movieId: parseInt(route.query.movieId),
+        theaterId: route.query.theaterId,
+        showTime: new Date(route.query.date + " " + route.query.time),
+        seatNumber: route.query.seats,
+        price: finalTotal.value,
+      }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || "Failed to book ticket");
+    }
+
+    router.push({
+      name: "PaymentSuccess",
+      query: {
+        movieId: route.query.movieId,
+        theaterId: route.query.theaterId,
+        date: route.query.date,
+        time: route.query.time,
+        price: finalTotal.value,
+        seats: route.query.seats,
+      },
+    });
+  } catch (error) {
+    errorMsg.value = error.message || "An error occurred during booking.";
+  } finally {
+    isProcessing.value = false;
+  }
 };
 </script>
 
@@ -150,7 +174,7 @@ const paymentSuccess = () => {
               <div
                 class="space-y-3 pb-4 border-b border-slate-100 dark:border-slate-800"
               >
-                <div class="flex justify-between text-sm">
+                <div class="flex justify-between text-sm" v-if="selectedMovie">
                   <span class="text-slate-500">Movie</span>
                   <span class="font-semibold">{{ selectedMovie.title }}</span>
                 </div>
@@ -178,11 +202,24 @@ const paymentSuccess = () => {
                 >
               </div>
 
+              <div
+                v-if="errorMsg"
+                class="mb-4 text-red-500 text-sm font-bold text-center"
+              >
+                {{ errorMsg }}
+              </div>
+
               <button
                 @click="paymentSuccess"
-                class="w-full bg-primary py-4 rounded-xl text-white font-black text-lg shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all"
+                :disabled="isProcessing"
+                class="w-full bg-primary py-4 rounded-xl text-white font-black text-lg shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2"
               >
-                Pay Now
+                <span
+                  v-if="isProcessing"
+                  class="material-symbols-outlined animate-spin"
+                  >progress_activity</span
+                >
+                <span>{{ isProcessing ? "Processing..." : "Pay Now" }}</span>
               </button>
 
               <p
