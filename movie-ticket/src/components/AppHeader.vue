@@ -52,8 +52,8 @@ const toggleNotifications = () => {
         >
         <router-link
           class="text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-semibold transition-colors"
-          to="/tickets"
-          >Tickets</router-link
+          to="/my-tickets"
+          >My Tickets</router-link
         >
       </nav>
     </div>

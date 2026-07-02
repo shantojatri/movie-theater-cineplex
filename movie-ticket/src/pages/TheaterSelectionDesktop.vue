@@ -4,12 +4,16 @@ import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import { useRoute, useRouter } from "vue-router";
 import { useMovies } from "../composables/useMovies";
+import { useTheaters } from "../composables/useTheaters";
+import { useAuth } from "../composables/useAuth";
 import TrailerModal from "../components/TrailerModal.vue";
 
 const route = useRoute();
 const router = useRouter();
 const isTrailerOpen = ref(false);
 const { getMovieById, fetchMovies } = useMovies();
+const { fetchTheaters, theatersForIds, toggleFavorite } = useTheaters();
+const { isAuthenticated } = useAuth();
 
 const getNextSevenDays = () => {
   const days = [];
@@ -57,36 +61,24 @@ const openTrailer = () => {
   }
 };
 
-const theatersList = ref([]);
-
 onMounted(async () => {
-  await fetchMovies();
-  try {
-    const res = await fetch("http://localhost:8080/api/theaters");
-    if (res.ok) {
-      theatersList.value = await res.json();
-    }
-  } catch (err) {
-    console.error("Failed to load theaters:", err);
-  }
+  await Promise.all([fetchMovies(), fetchTheaters()]);
 });
 
 const movieTheatersDetails = computed(() => {
-  // If no theaters array is present (since we transitioned to PostgreSQL without M2M tables),
-  // just show all verified theaters as a fallback so the UI isn't empty.
   const theaterIds = selectedMovie.value?.theaters || [
-    "amc-metreon-16", 
-    "century-san-francisco-centre", 
+    "amc-metreon-16",
+    "century-san-francisco-centre",
     "roxie-theater",
-    "regal-stonestown"
+    "regal-stonestown",
   ];
-
-  return theaterIds
-    .map((id) => {
-      return theatersList.value.find((t) => t.theaterId === id);
-    })
-    .filter((t) => t !== undefined);
+  return theatersForIds(theaterIds);
 });
+
+const handleToggleFavorite = async (theaterId) => {
+  if (!isAuthenticated.value) return;
+  await toggleFavorite(theaterId);
+};
 
 const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
   router.push({
@@ -102,6 +94,7 @@ const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
   });
 };
 </script>
+
 
 <template>
   <div
@@ -304,9 +297,15 @@ const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
                     </p>
                   </div>
                   <button
-                    class="p-2 text-slate-400 hover:text-primary transition-colors"
+                    @click="handleToggleFavorite(theater.theaterId)"
+                    :title="isAuthenticated ? (theater.isFavorite ? 'Remove from favorites' : 'Add to favorites') : 'Login to favorite'"
+                    :class="[
+                      'p-2 transition-colors rounded-lg',
+                      theater.isFavorite ? 'text-red-500 hover:text-red-600' : 'text-slate-400 hover:text-primary',
+                      !isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    ]"
                   >
-                    <span class="material-symbols-outlined">favorite</span>
+                    <span :class="['material-symbols-outlined', theater.isFavorite ? 'filled' : '']">favorite</span>
                   </button>
                 </div>
                 <div class="p-5 flex flex-col gap-6">

@@ -259,7 +259,8 @@ export const movies: Movie[] = [
     status: "Coming Soon",
     rating: 0,
     duration: "2h 15m",
-    imageUrl: "https://m.media-amazon.com/images/M/MV5BY2FhZGE3NmEtNWJjOC00NDI1LWFhMTQtMjcxNmQzZmEwNGIzXkEyXkFqcGc@._V1_.jpg",
+    imageUrl:
+      "https://m.media-amazon.com/images/M/MV5BY2FhZGE3NmEtNWJjOC00NDI1LWFhMTQtMjcxNmQzZmEwNGIzXkEyXkFqcGc@._V1_.jpg",
     year: 2024,
     casts: ["Bill Skarsgård", "Nicholas Hoult", "Lily-Rose Depp"],
     trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
