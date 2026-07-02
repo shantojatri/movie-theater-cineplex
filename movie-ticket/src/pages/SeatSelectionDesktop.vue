@@ -1,28 +1,21 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { movies, featuredMovie, theaters } from "../data/movies";
+import { useMovies } from "../composables/useMovies";
 import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 
 const route = useRoute();
 const router = useRouter();
 
-const selectedMovie = computed(() => {
-  const movieId = route.query.movieId;
+const { getMovieById, fetchMovies } = useMovies();
 
-  const foundInArray = movies.find((m) => m.id === movieId);
-  if (foundInArray) return foundInArray;
+const selectedMovie = getMovieById(route.query.movieId);
 
-  if (featuredMovie.id === movieId) {
-    return featuredMovie;
-  }
-
-  return featuredMovie;
-});
+const theatersList = ref([]);
 
 const selectedTheater = computed(() => {
-  return theaters.find((t) => t.theaterId === route.query.theaterId);
+  return theatersList.value.find((t) => t.theaterId === route.query.theaterId);
 });
 
 const formatedDate = () => {
@@ -42,8 +35,29 @@ const rows = ["A", "B", "C", "D", "E"];
 const seatsPerRow = 10;
 const aisles = [3, 7]; // Aisle appears after these seat numbers
 
-// Mock data for sold-out seats
-const soldOutSeats = ref(["B2", "B9", "B10", "D4", "D5", "D6", "D7"]);
+// Reactive state for sold-out seats from backend
+const soldOutSeats = ref([]);
+
+onMounted(async () => {
+  await fetchMovies();
+  try {
+    const resTheaters = await fetch("http://localhost:8080/api/theaters");
+    if (resTheaters.ok) {
+      theatersList.value = await resTheaters.json();
+    }
+
+    const { movieId, theaterId, date, time } = route.query;
+    const showTimeStr = new Date(`${date} ${time}`).toISOString();
+    
+    const resSeats = await fetch(`http://localhost:8080/api/seats/booked?movieId=${movieId}&theaterId=${theaterId}&showTime=${encodeURIComponent(showTimeStr)}`);
+    if (resSeats.ok) {
+      const data = await resSeats.json();
+      soldOutSeats.value = data.bookedSeats || [];
+    }
+  } catch (err) {
+    console.error("Failed to load seats or theaters:", err);
+  }
+});
 
 // Reactive state for user selection
 const selectedSeats = ref([]);
@@ -78,7 +92,7 @@ const confirmBooking = () => {
     router.push({
       name: "CheckoutPage",
       query: {
-        movieId: selectedMovie.value.id,
+        movieId: selectedMovie.value.ID || selectedMovie.value.id,
         theaterId: selectedTheater.value.theaterId,
         date: route.query.date,
         time: route.query.time,

@@ -1,14 +1,19 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import { useRoute, useRouter } from "vue-router";
-import { movies, featuredMovie, theaters } from "../data/movies";
+import { useMovies } from "../composables/useMovies";
+import { useTheaters } from "../composables/useTheaters";
+import { useAuth } from "../composables/useAuth";
 import TrailerModal from "../components/TrailerModal.vue";
 
 const route = useRoute();
 const router = useRouter();
 const isTrailerOpen = ref(false);
+const { getMovieById, fetchMovies } = useMovies();
+const { fetchTheaters, theatersForIds, toggleFavorite } = useTheaters();
+const { isAuthenticated } = useAuth();
 
 const getNextSevenDays = () => {
   const days = [];
@@ -48,18 +53,7 @@ const activeDate = ref(0);
 const formats = ["All Formats", "IMAX", "Standard"];
 const activeFormat = ref("All Formats");
 
-const selectedMovie = computed(() => {
-  const movieId = route.query.movieId;
-
-  const foundInArray = movies.find((m) => m.id === movieId);
-  if (foundInArray) return foundInArray;
-
-  if (featuredMovie.id === movieId) {
-    return featuredMovie;
-  }
-
-  return featuredMovie;
-});
+const selectedMovie = getMovieById(route.query.movieId);
 
 const openTrailer = () => {
   if (selectedMovie.value?.trailerUrl) {
@@ -67,21 +61,30 @@ const openTrailer = () => {
   }
 };
 
-const movieTheatersDetails = computed(() => {
-  const theaterIds = selectedMovie.value?.theaters || [];
-
-  return theaterIds
-    .map((id) => {
-      return theaters.find((t) => t.theaterId === id);
-    })
-    .filter((t) => t !== undefined);
+onMounted(async () => {
+  await Promise.all([fetchMovies(), fetchTheaters()]);
 });
+
+const movieTheatersDetails = computed(() => {
+  const theaterIds = selectedMovie.value?.theaters || [
+    "amc-metreon-16",
+    "century-san-francisco-centre",
+    "roxie-theater",
+    "regal-stonestown",
+  ];
+  return theatersForIds(theaterIds);
+});
+
+const handleToggleFavorite = async (theaterId) => {
+  if (!isAuthenticated.value) return;
+  await toggleFavorite(theaterId);
+};
 
 const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
   router.push({
     path: "/tickets",
     query: {
-      movieId: selectedMovie.value.id,
+      movieId: selectedMovie.value.ID || selectedMovie.value.id,
       theaterId: theaterId,
       date: dates.value[activeDate.value].fullDate,
       price: moviePrice,
@@ -91,6 +94,7 @@ const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
   });
 };
 </script>
+
 
 <template>
   <div
@@ -293,9 +297,15 @@ const gotoTicketSelection = (moviePrice, time, theaterId, type) => {
                     </p>
                   </div>
                   <button
-                    class="p-2 text-slate-400 hover:text-primary transition-colors"
+                    @click="handleToggleFavorite(theater.theaterId)"
+                    :title="isAuthenticated ? (theater.isFavorite ? 'Remove from favorites' : 'Add to favorites') : 'Login to favorite'"
+                    :class="[
+                      'p-2 transition-colors rounded-lg',
+                      theater.isFavorite ? 'text-red-500 hover:text-red-600' : 'text-slate-400 hover:text-primary',
+                      !isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    ]"
                   >
-                    <span class="material-symbols-outlined">favorite</span>
+                    <span :class="['material-symbols-outlined', theater.isFavorite ? 'filled' : '']">favorite</span>
                   </button>
                 </div>
                 <div class="p-5 flex flex-col gap-6">

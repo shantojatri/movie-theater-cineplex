@@ -4,8 +4,9 @@ import { useRouter, useRoute } from "vue-router";
 import HeaderDesktop from "../components/AppHeader.vue";
 import AppFooter from "../components/AppFooter.vue";
 import TrailerModal from "../components/TrailerModal.vue";
-import { movies } from "../data/movies";
+import { useMovies } from "../composables/useMovies";
 
+const { movies, fetchMovies, isLoading, error } = useMovies();
 const router = useRouter();
 const route = useRoute();
 const searchQuery = ref("");
@@ -20,13 +21,15 @@ function openTrailer(url) {
 
 // Unique genres derived from data
 const genres = computed(() => {
-  const all = movies.map((m) => m.genre);
+  if (!movies.value) return ["All"];
+  const all = movies.value.map((m) => m.genre);
   return ["All", ...new Set(all)];
 });
 
 // Filtered movies based on search + genre
 const filteredMovies = computed(() => {
-  let result = movies;
+  if (!movies.value) return [];
+  let result = movies.value;
   if (selectedGenre.value !== "All") {
     result = result.filter((m) => m.genre === selectedGenre.value);
   }
@@ -58,6 +61,7 @@ const mainContent = ref(null);
 
 onMounted(() => {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  fetchMovies();
 });
 </script>
 
@@ -106,9 +110,15 @@ onMounted(() => {
           </button>
         </div>
 
-        <!-- Empty State -->
+        <!-- Empty State & Loading -->
+        <div v-if="isLoading" class="flex justify-center py-24">
+          <span class="material-symbols-outlined animate-spin text-5xl text-primary">progress_activity</span>
+        </div>
+        <div v-else-if="error" class="text-center text-red-500 py-24 font-bold">
+          {{ error }}
+        </div>
         <div
-          v-if="filteredMovies.length === 0"
+          v-else-if="filteredMovies.length === 0"
           class="flex flex-col items-center justify-center py-24 gap-4"
         >
           <span
@@ -155,8 +165,8 @@ onMounted(() => {
             >
               <div
                 v-for="movie in groupMovies"
-                :key="movie.id"
-                @click="goToMovie(movie.id)"
+                :key="movie.ID"
+                @click="goToMovie(movie.ID)"
                 class="group flex flex-col gap-3 cursor-pointer"
               >
                 <div
@@ -182,7 +192,7 @@ onMounted(() => {
                     </button>
 
                     <button
-                      @click.stop="goToMovie(movie.id)"
+                      @click.stop="goToMovie(movie.ID)"
                       class="absolute bottom-4 left-4 right-4 bg-primary text-white py-2 rounded-lg font-bold text-sm shadow-lg hover:bg-primary/90 transition-colors cursor-pointer flex items-center justify-center gap-1"
                     >
                       <span class="material-symbols-outlined text-base">confirmation_number</span>
